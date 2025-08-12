@@ -129,5 +129,9 @@ async def main():
                 print(f"Error clearing: {e}")
 
 
+
+def core(cliargs):
+        asyncio.run(main(cliargs))  # Use asyncio.run to run the core async function
+
 if __name__ == "__main__":
     asyncio.run(main())

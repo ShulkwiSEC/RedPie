@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from playwright.async_api import async_playwright
 import shutil
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 from PIL import Image
 
 
@@ -18,8 +19,8 @@ class ImageViewer:
         self.viewer_open = True
 
         self.fig, self.ax = plt.subplots()
-        self.btn_prev = plt.Button(plt.axes([0.1, 0.01, 0.3, 0.075]), 'Previous')
-        self.btn_next = plt.Button(plt.axes([0.6, 0.01, 0.3, 0.075]), 'Next')
+        self.btn_prev = Button(plt.axes([0.1, 0.01, 0.3, 0.075]), 'Previous')
+        self.btn_next = Button(plt.axes([0.6, 0.01, 0.3, 0.075]), 'Next')
 
         self.btn_prev.on_clicked(self.previous_image)
         self.btn_next.on_clicked(self.next_image)
@@ -86,7 +87,7 @@ class Snap:
             await browser.close()
 
 
-async def main():
+async def main(cliargs=None):
     parser = argparse.ArgumentParser(description='Take a screenshot of a webpage.')
     parser.add_argument('--url', type=str, help='The URL of the webpage to screenshot.')
     parser.add_argument('-o', '--output', type=str, help='Optional output filename for the screenshot (default: <webpage>.png)')
@@ -94,7 +95,12 @@ async def main():
     parser.add_argument('-vi', '--view', action='store_true', help='Optional auto view the images after taken')
     parser.add_argument('-cf', '--clearafter', action='store_true', help='Clear images after viewing')
 
-    args = parser.parse_args()
+    if isinstance(cliargs, list):
+        args = parser.parse_args(cliargs)
+    elif isinstance(cliargs, argparse.Namespace):
+        args = cliargs
+    else:
+        args = parser.parse_args()
 
     if not args.url and not args.fromfile:
         parser.error('Please include either --url or --fromfile. Neither provided.')
@@ -129,9 +135,9 @@ async def main():
                 print(f"Error clearing: {e}")
 
 
-
 def core(cliargs):
-        asyncio.run(main(cliargs))  # Use asyncio.run to run the core async function
+    asyncio.run(main(cliargs))
+
 
 if __name__ == "__main__":
     asyncio.run(main())
